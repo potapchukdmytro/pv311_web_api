@@ -5,6 +5,7 @@ using pv311_web_api.BLL.DTOs.Account;
 using pv311_web_api.BLL.Services.Account;
 using pv311_web_api.BLL.Services.Email;
 using pv311_web_api.BLL.Services.Role;
+using pv311_web_api.BLL.Services.User;
 using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
 
@@ -14,11 +15,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 builder.Services.AddControllers();
 
 // Add fluent validation
 builder.Services.AddValidatorsFromAssemblyContaining<LoginValidator>();
+
+// Add automapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 //builder.Services.AddOpenApi();

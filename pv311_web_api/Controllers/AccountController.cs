@@ -45,11 +45,22 @@ namespace pv311_web_api.Controllers
                 return NotFound();
 
             var result = await _accountService.EmailConfirmAsync(id, t);
-            
+
             if (!result)
                 return NotFound();
 
             return Redirect("https://google.com");
+        }
+
+        [HttpGet("sendEmailConfirm")]
+        public async Task<IActionResult> SendEmailConfirmAsync(string? userId)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(userId))
+                return NotFound();
+
+            var result = await _accountService.SendEmailConfirmAsync(userId);
+
+            return result ? Ok() : BadRequest();
         }
     }
 }

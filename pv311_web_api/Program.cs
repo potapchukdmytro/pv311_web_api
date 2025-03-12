@@ -1,9 +1,13 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using pv311_web_api.BLL;
 using pv311_web_api.BLL.DTOs.Account;
 using pv311_web_api.BLL.Services.Account;
 using pv311_web_api.BLL.Services.Email;
+using pv311_web_api.BLL.Services.Image;
+using pv311_web_api.BLL.Services.Manufactures;
 using pv311_web_api.BLL.Services.Role;
 using pv311_web_api.BLL.Services.User;
 using pv311_web_api.DAL;
@@ -15,7 +19,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<IRoleService, RoleService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IManufactureService, ManufactureService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IImageService, ImageService>();
 
 builder.Services.AddControllers();
 
@@ -73,6 +79,27 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("localhost3000");
+
+// Static files
+var rootPath = Path.Combine(builder.Environment.ContentRootPath, "wwwroot");
+var imagesPath = Path.Combine(rootPath, Settings.ImagesPath);
+Settings.FilesRootPath = builder.Environment.ContentRootPath;
+
+if (!Directory.Exists(rootPath))
+{
+    Directory.CreateDirectory(rootPath);
+}
+
+if (!Directory.Exists(imagesPath))
+{
+    Directory.CreateDirectory(imagesPath);
+}
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(imagesPath),
+    RequestPath = "/images"
+});
 
 app.UseAuthorization();
 

@@ -4,20 +4,21 @@ using pv311_web_api.BLL.DTOs.Manufactures;
 using pv311_web_api.BLL.Services.Image;
 using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
+using pv311_web_api.DAL.Repositories.Manufactures;
 
 namespace pv311_web_api.BLL.Services.Manufactures
 {
     public class ManufactureService : IManufactureService
     {
         private readonly IMapper _mapper;
-        private readonly AppDbContext _context;
+        private readonly IManufactureRepository _manufactureRepository;
         private readonly IImageService _imageService;
 
-        public ManufactureService(IMapper mapper, AppDbContext context, IImageService imageService)
+        public ManufactureService(IMapper mapper, IImageService imageService, IManufactureRepository manufactureRepository)
         {
             _mapper = mapper;
-            _context = context;
             _imageService = imageService;
+            _manufactureRepository = manufactureRepository;
         }
 
         public async Task<bool> CreateAsync(CreateManufactureDto dto)
@@ -36,15 +37,13 @@ namespace pv311_web_api.BLL.Services.Manufactures
 
             entity.Image = imageName;
 
-            await _context.Manufactures.AddAsync(entity);
-            var result = await _context.SaveChangesAsync();
-
-            return result != 0;
+            var result = await _manufactureRepository.CreateAsync(entity);
+            return result;
         }
 
         public async Task<bool> DeleteAsync(string id)
         {
-            var entity = await _context.Manufactures.FirstOrDefaultAsync(m => m.Id == id);
+            var entity = await _manufactureRepository.GetByIdAsync(id);
             if(entity == null)
             {
                 return false;
@@ -55,21 +54,21 @@ namespace pv311_web_api.BLL.Services.Manufactures
                 _imageService.DeleteImage(entity.Image);
             }
 
-            _context.Manufactures.Remove(entity);
-            var result = await _context.SaveChangesAsync();
-            return result != 0;
+            var result = await _manufactureRepository.DeleteAsync(entity);
+            return result;
         }
 
         public async Task<ManufactureDto?> GetByIdAsync(string id)
         {
-            var entity = await _context.Manufactures.FirstOrDefaultAsync(m => m.Id == id);
+            var entity = await _manufactureRepository.GetByIdAsync(id);
             var dto = _mapper.Map<ManufactureDto>(entity);
             return dto;
         }
 
         public async Task<bool> UpdateAsync(UpdateManufactureDto dto)
         {
-            var entity = await _context.Manufactures
+            var entity = await _manufactureRepository
+                .GetAll()
                 .AsNoTracking()
                 .FirstOrDefaultAsync(m => m.Id == dto.Id);
 
@@ -95,9 +94,8 @@ namespace pv311_web_api.BLL.Services.Manufactures
                 entity.Image = imageName;
             }
 
-            _context.Manufactures.Update(entity);
-            var result = await _context.SaveChangesAsync();
-            return result != 0;
+            var result = await _manufactureRepository.UpdateAsync(entity);
+            return result;
         }
     }
 }

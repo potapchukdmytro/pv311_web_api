@@ -12,6 +12,8 @@ using pv311_web_api.BLL.Services.Role;
 using pv311_web_api.BLL.Services.User;
 using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
+using pv311_web_api.DAL.Repositories.Cars;
+using pv311_web_api.DAL.Repositories.Manufactures;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,10 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IManufactureService, ManufactureService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+
+// Add repositories
+builder.Services.AddScoped<ICarRepository, CarRepository>();
+builder.Services.AddScoped<IManufactureRepository, ManufactureRepository>();
 
 builder.Services.AddControllers();
 

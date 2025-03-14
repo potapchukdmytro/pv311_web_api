@@ -53,5 +53,12 @@ namespace pv311_web_api.Controllers
 
             return result == null ? BadRequest("null") : Ok(result);
         }
+
+        [HttpGet("list")]
+        public async Task<IActionResult> GetAllAsync()
+        {
+            var response = await _manufactureService.GetAllAsync();
+            return CreateActionResult(response);
+        }
     }
 }

@@ -57,6 +57,16 @@ namespace pv311_web_api.BLL.Services.Manufactures
             return result;
         }
 
+        public async Task<ServiceResponse> GetAllAsync()
+        {
+            var entity = await _manufactureRepository
+                .GetAll()
+                .ToListAsync();
+            var dtos = _mapper.Map<List<ManufactureDto>>(entity);
+
+            return new ServiceResponse("Виробники отримано", true, dtos);
+        }
+
         public async Task<ManufactureDto?> GetByIdAsync(string id)
         {
             var entity = await _manufactureRepository.GetByIdAsync(id);

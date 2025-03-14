@@ -2,7 +2,6 @@
 using Microsoft.EntityFrameworkCore;
 using pv311_web_api.BLL.DTOs.Manufactures;
 using pv311_web_api.BLL.Services.Image;
-using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
 using pv311_web_api.DAL.Repositories.Manufactures;
 

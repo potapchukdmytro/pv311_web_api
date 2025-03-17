@@ -5,6 +5,7 @@ using Microsoft.Extensions.FileProviders;
 using pv311_web_api.BLL;
 using pv311_web_api.BLL.DTOs.Account;
 using pv311_web_api.BLL.Services.Account;
+using pv311_web_api.BLL.Services.Cars;
 using pv311_web_api.BLL.Services.Email;
 using pv311_web_api.BLL.Services.Image;
 using pv311_web_api.BLL.Services.Manufactures;
@@ -24,6 +25,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IManufactureService, ManufactureService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IImageService, ImageService>();
+builder.Services.AddScoped<ICarService, CarService>();
 
 // Add repositories
 builder.Services.AddScoped<ICarRepository, CarRepository>();

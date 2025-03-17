@@ -1,15 +1,31 @@
 ﻿using Microsoft.AspNetCore.Http;
+using pv311_web_api.DAL.Entities;
 
 namespace pv311_web_api.BLL.Services.Image
 {
     public class ImageService : IImageService
     {
+        private readonly string ImagesPath;
+
+        public ImageService()
+        {
+            ImagesPath = Path.Combine(Settings.FilesRootPath, "wwwroot", Settings.ImagesPath);
+        }
+
+        public void CreateDirectory(string path)
+        {
+            path = Path.Combine(ImagesPath, path);
+            if (!Directory.Exists(path))
+            {
+                Directory.CreateDirectory(path);
+            }
+        }
+
         public void DeleteImage(string filePath)
         {
             try
             {
-                string rootPath = Path.Combine(Settings.FilesRootPath, "wwwroot", Settings.ImagesPath);
-                string path = Path.Combine(rootPath, filePath);
+                string path = Path.Combine(ImagesPath, filePath);
 
                 if(File.Exists(path))
                 {
@@ -22,6 +38,28 @@ namespace pv311_web_api.BLL.Services.Image
             }
         }
 
+        public async Task<List<CarImage>> SaveCarImagesAsync(IEnumerable<IFormFile> images, string directoryPath)
+        {
+            var carImages = new List<CarImage>();
+
+            foreach (var image in images)
+            {
+                var imageName = await SaveImageAsync(image, directoryPath);
+                if (imageName != null)
+                {
+                    var carImage = new CarImage
+                    {
+                        Name = imageName,
+                        Path = directoryPath
+                    };
+                    carImages.Add(carImage);
+                }
+                
+            }
+
+            return carImages;
+        }
+
         public async Task<string?> SaveImageAsync(IFormFile image, string directoryPath)
         {
             try
@@ -32,8 +70,7 @@ namespace pv311_web_api.BLL.Services.Image
                     return null;
                 }
 
-                string rootPath = Path.Combine(Settings.FilesRootPath, "wwwroot", Settings.ImagesPath);
-                string workPath = Path.Combine(rootPath, directoryPath);
+                string workPath = Path.Combine(ImagesPath, directoryPath);
                 string imageName = $"{Guid.NewGuid()}.{types[1]}";
                 string imagePath = Path.Combine(workPath, imageName);
 

@@ -13,6 +13,7 @@ namespace pv311_web_api.DAL
             : base(options) { }
 
         public DbSet<Car> Cars { get; set; }
+        public DbSet<CarImage> CarImages { get; set; }
         public DbSet<Manufacture> Manufactures { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

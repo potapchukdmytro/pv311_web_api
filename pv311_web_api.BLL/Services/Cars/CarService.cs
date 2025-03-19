@@ -52,15 +52,28 @@ namespace pv311_web_api.BLL.Services.Cars
             return new ServiceResponse($"Автомобіль '{entity.Brand} {entity.Model}' збережено", true);
         }
 
-        public async Task<ServiceResponse> GetAllAsync()
+        public async Task<ServiceResponse> GetAllAsync(int page = 1, int pageSize = 10)
         {
-            var entities = await _carRepository
-                .GetAll()
-                .Include(e => e.Images)
-                .Include(e => e.Manufacture)
+            var cars = await _carRepository
+                .GetCars(page, pageSize)
+                .Include(c => c.Images)
+                .Include(c => c.Manufacture)
                 .ToListAsync();
 
-            var dtos = _mapper.Map<List<CarDto>>(entities);
+            var dtos = _mapper.Map<List<CarDto>>(cars);
+
+            return new ServiceResponse("Автомобілі отримано", true, dtos);
+        }
+
+        public async Task<ServiceResponse> GetByPriceAsync(Range range, int page = 1, int pageSize = 10)
+        {
+            var cars = await _carRepository
+                .GetCars(page, pageSize, c => c.Price >= range.Start.Value && c.Price <= range.End.Value)
+                .Include(c => c.Images)
+                .Include(c => c.Manufacture)
+                .ToListAsync();
+
+            var dtos = _mapper.Map<List<CarDto>>(cars);
 
             return new ServiceResponse("Автомобілі отримано", true, dtos);
         }

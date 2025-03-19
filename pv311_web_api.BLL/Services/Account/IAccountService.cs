@@ -1,13 +1,11 @@
 ﻿using pv311_web_api.BLL.DTOs.Account;
-using pv311_web_api.BLL.DTOs.User;
-using pv311_web_api.DAL.Entities;
 
 namespace pv311_web_api.BLL.Services.Account
 {
     public interface IAccountService
     {
-        Task<AppUser?> LoginAsync(LoginDto dto);
-        Task<UserDto?> RegisterAsync(RegisterDto dto);
+        Task<ServiceResponse> LoginAsync(LoginDto dto);
+        Task<ServiceResponse> RegisterAsync(RegisterDto dto);
         Task<bool> EmailConfirmAsync(string id, string token);
         Task<bool> SendEmailConfirmAsync(string userId);
     }

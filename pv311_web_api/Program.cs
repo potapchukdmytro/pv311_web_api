@@ -1,7 +1,9 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using Microsoft.IdentityModel.Tokens;
 using pv311_web_api.BLL;
 using pv311_web_api.BLL.DTOs.Account;
 using pv311_web_api.BLL.Services.Account;
@@ -15,8 +17,30 @@ using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
 using pv311_web_api.DAL.Repositories.Cars;
 using pv311_web_api.DAL.Repositories.Manufactures;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add jwt
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            RequireExpirationTime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? ""))
+        };
+    });
 
 // Add services to the container.
 builder.Services.AddScoped<IAccountService, AccountService>();
@@ -109,6 +133,7 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/images"
 });
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

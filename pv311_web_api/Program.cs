@@ -17,6 +17,7 @@ using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
 using pv311_web_api.DAL.Repositories.Cars;
 using pv311_web_api.DAL.Repositories.Manufactures;
+using pv311_web_api.Middlewares;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -99,6 +100,11 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// Middlewares
+app.UseMiddleware<MiddlewareLogger>();
+app.UseMiddleware<MiddlewareExceptionHandler>();
+app.UseMiddleware<MiddlewareNullExceptionHandler>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

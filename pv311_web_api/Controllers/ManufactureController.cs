@@ -9,10 +9,12 @@ namespace pv311_web_api.Controllers
     public class ManufactureController : AppController
     {
         private readonly IManufactureService _manufactureService;
+        private readonly ILogger<ManufactureController> _logger;
 
-        public ManufactureController(IManufactureService manufactureService)
+        public ManufactureController(IManufactureService manufactureService, ILogger<ManufactureController> logger)
         {
             _manufactureService = manufactureService;
+            _logger = logger;
         }
 
         [HttpPost]

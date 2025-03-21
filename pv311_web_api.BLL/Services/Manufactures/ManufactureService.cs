@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using pv311_web_api.BLL.DTOs.Manufactures;
 using pv311_web_api.BLL.Services.Image;
 using pv311_web_api.DAL.Entities;
 using pv311_web_api.DAL.Repositories.Manufactures;
+using System.Text;
 
 namespace pv311_web_api.BLL.Services.Manufactures
 {
@@ -12,12 +14,14 @@ namespace pv311_web_api.BLL.Services.Manufactures
         private readonly IMapper _mapper;
         private readonly IManufactureRepository _manufactureRepository;
         private readonly IImageService _imageService;
+        private readonly ILogger<ManufactureService> _logger;
 
-        public ManufactureService(IMapper mapper, IImageService imageService, IManufactureRepository manufactureRepository)
+        public ManufactureService(IMapper mapper, IImageService imageService, IManufactureRepository manufactureRepository, ILogger<ManufactureService> logger)
         {
             _mapper = mapper;
             _imageService = imageService;
             _manufactureRepository = manufactureRepository;
+            _logger = logger;
         }
 
         public async Task<bool> CreateAsync(CreateManufactureDto dto)
@@ -63,6 +67,12 @@ namespace pv311_web_api.BLL.Services.Manufactures
                 .GetAll()
                 .ToListAsync();
             var dtos = _mapper.Map<List<ManufactureDto>>(entity);
+
+            string manufactureNames = string.Join(", ", dtos.Select(x => x.Name));
+            string date = DateTime.Now.ToString("dd.MM.yyyy HH:mm: ss: fff");
+
+            string logMessage = $"Manufactures recived - {date}: {manufactureNames}";
+            _logger.LogInformation(new EventId(10), logMessage);
 
             return new ServiceResponse("Виробники отримано", true, dtos);
         }

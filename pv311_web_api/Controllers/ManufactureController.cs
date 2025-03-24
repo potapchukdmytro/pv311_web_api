@@ -20,15 +20,15 @@ namespace pv311_web_api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateAsync(CreateManufactureDto dto)
         {
-            var result = await _manufactureService.CreateAsync(dto);
-            return result ? Ok($"{dto.Name} created") : BadRequest("Error");
+            var response = await _manufactureService.CreateAsync(dto);
+            return CreateActionResult(response);
         }
 
         [HttpPut]
         public async Task<IActionResult> UpdateAsync(UpdateManufactureDto dto)
         {
-            var result = await _manufactureService.UpdateAsync(dto);
-            return result ? Ok($"{dto.Name} updated") : BadRequest("Error");
+            var response = await _manufactureService.UpdateAsync(dto);
+            return CreateActionResult(response);
         }
 
         [HttpDelete]
@@ -39,27 +39,16 @@ namespace pv311_web_api.Controllers
                 return BadRequest(error);
             }
 
-            var result = await _manufactureService.DeleteAsync(id);
-            return result ? Ok($"Deleted") : BadRequest("Error");
+            var response = await _manufactureService.DeleteAsync(id);
+            return CreateActionResult(response);
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetByIdAsync(string? id)
+        public async Task<IActionResult> GetAsync(string? id)
         {
-            if(!ValidateId(id, out string error))
-            {
-                return BadRequest(error);
-            }
-
-            var result = await _manufactureService.GetByIdAsync(id);
-
-            return result == null ? BadRequest("null") : Ok(result);
-        }
-
-        [HttpGet("list")]
-        public async Task<IActionResult> GetAllAsync()
-        {
-            var response = await _manufactureService.GetAllAsync();
+            var response = string.IsNullOrEmpty(id)
+                ? await _manufactureService.GetAllAsync()
+                : await _manufactureService.GetByIdAsync(id);
             return CreateActionResult(response);
         }
     }

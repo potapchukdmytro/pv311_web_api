@@ -18,8 +18,8 @@
 
             await _next(context);
 
-            message = $"Response: {context.Response.StatusCode} Type: {context.Response.Headers.ContentType} - {DateTime.Now}";
+            message = $"Response: {context.Response.StatusCode} - {DateTime.Now}";
             _logger.LogInformation(message);
         }
-    }
+    }   
 }

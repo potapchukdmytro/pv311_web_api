@@ -18,21 +18,13 @@ namespace pv311_web_api.Controllers
             _roleValidator = roleValidator;
         }
 
-        [HttpGet("list")]
-        public async Task<IActionResult> GetAllAsync()
-        {
-            var response = await _roleService.GetAllAsync();
-            return CreateActionResult(response);
-        }
-
         [HttpGet]
-        public async Task<IActionResult> GetByIdAsync(string? id)
+        public async Task<IActionResult> GetAsync(string? id)
         {
-            var isValidId = ValidateId(id, out string message);
-            if (!isValidId)
-                return BadRequest(message);
+            var response = string.IsNullOrEmpty(id)
+                ? await _roleService.GetAllAsync()
+                : await _roleService.GetByIdAsync(id);
 
-            var response = await _roleService.GetByIdAsync(id);
             return CreateActionResult(response);
         }
 

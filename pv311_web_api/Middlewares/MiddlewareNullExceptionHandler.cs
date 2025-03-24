@@ -17,7 +17,7 @@ namespace pv311_web_api.Middlewares
             {
                 await _next(context);
             }
-            catch (ArgumentNullException ex)
+            catch (ArgumentNullException)
             {
                 var response = new ServiceResponse("Значення є null");
 

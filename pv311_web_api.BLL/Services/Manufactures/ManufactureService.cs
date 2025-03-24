@@ -24,7 +24,7 @@ namespace pv311_web_api.BLL.Services.Manufactures
             _logger = logger;
         }
 
-        public async Task<bool> CreateAsync(CreateManufactureDto dto)
+        public async Task<ServiceResponse> CreateAsync(CreateManufactureDto dto)
         {
             var entity = _mapper.Map<Manufacture>(dto);
             string? imageName = null;
@@ -41,15 +41,21 @@ namespace pv311_web_api.BLL.Services.Manufactures
             entity.Image = imageName;
 
             var result = await _manufactureRepository.CreateAsync(entity);
-            return result;
+            
+            if(result)
+            {
+                return new ServiceResponse($"Виробника {dto.Name} додано", true);
+            }
+
+            return new ServiceResponse("Помилка збереження виробника");
         }
 
-        public async Task<bool> DeleteAsync(string id)
+        public async Task<ServiceResponse> DeleteAsync(string id)
         {
             var entity = await _manufactureRepository.GetByIdAsync(id);
             if(entity == null)
             {
-                return false;
+                return new ServiceResponse($"Виробника з id {id} не знайдено");
             }
 
             if(!string.IsNullOrEmpty(entity.Image))
@@ -58,7 +64,13 @@ namespace pv311_web_api.BLL.Services.Manufactures
             }
 
             var result = await _manufactureRepository.DeleteAsync(entity);
-            return result;
+
+            if (result)
+            {
+                return new ServiceResponse($"Виробника {entity.Name} видалено", true);
+            }
+
+            return new ServiceResponse("Помилка видалення виробника");
         }
 
         public async Task<ServiceResponse> GetAllAsync()
@@ -77,14 +89,20 @@ namespace pv311_web_api.BLL.Services.Manufactures
             return new ServiceResponse("Виробники отримано", true, dtos);
         }
 
-        public async Task<ManufactureDto?> GetByIdAsync(string id)
+        public async Task<ServiceResponse> GetByIdAsync(string id)
         {
             var entity = await _manufactureRepository.GetByIdAsync(id);
+
+            if (entity == null)
+            {
+                return new ServiceResponse($"Виробника з id {id} не знайдено");
+            }
+
             var dto = _mapper.Map<ManufactureDto>(entity);
-            return dto;
+            return new ServiceResponse("Виробника отримано", true, dto);
         }
 
-        public async Task<bool> UpdateAsync(UpdateManufactureDto dto)
+        public async Task<ServiceResponse> UpdateAsync(UpdateManufactureDto dto)
         {
             var entity = await _manufactureRepository
                 .GetAll()
@@ -93,7 +111,7 @@ namespace pv311_web_api.BLL.Services.Manufactures
 
             if (entity == null)
             {
-                return false;
+                return new ServiceResponse($"Виробника з id {dto.Id} не знайдено");
             }
             entity = _mapper.Map(dto, entity);
 
@@ -114,7 +132,13 @@ namespace pv311_web_api.BLL.Services.Manufactures
             }
 
             var result = await _manufactureRepository.UpdateAsync(entity);
-            return result;
+
+            if (result)
+            {
+                return new ServiceResponse($"Виробника {dto.Name} оновлено", true);
+            }
+
+            return new ServiceResponse("Помилка оновлення виробника");
         }
     }
 }

@@ -83,7 +83,14 @@ namespace pv311_web_api.BLL.Services.Role
                 return new ServiceResponse($"Роль '{dto.Name}' вже існує");
             }
 
-            var entity = _mapper.Map<AppRole>(dto);
+            var role = await _roleManager.FindByIdAsync(dto.Id);
+
+            if(role == null)
+            {
+                return new ServiceResponse($"Роль {dto.Id} не знайдено");
+            }
+
+            var entity = _mapper.Map(dto, role);
 
             var result = await _roleManager.UpdateAsync(entity);
 

@@ -1,4 +1,6 @@
 ﻿using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using pv311_web_api.BLL.DTOs.Role;
 using pv311_web_api.BLL.Services.Role;
@@ -7,6 +9,7 @@ namespace pv311_web_api.Controllers
 {
     [ApiController]
     [Route("api/role")]
+    [Authorize(Roles = "admin,manager", AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class RoleController : AppController
     {
         private readonly IRoleService _roleService;
@@ -19,6 +22,7 @@ namespace pv311_web_api.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAsync(string? id)
         {
             var response = string.IsNullOrEmpty(id)

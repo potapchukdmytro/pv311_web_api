@@ -25,6 +25,8 @@ namespace pv311_web_api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GetAsync(string? id)
         {
+            
+
             var response = string.IsNullOrEmpty(id)
                 ? await _roleService.GetAllAsync()
                 : await _roleService.GetByIdAsync(id);

@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using pv311_web_api.BLL.DTOs.Account;
 using pv311_web_api.BLL.Services.Email;
+using pv311_web_api.BLL.Services.JwtService;
 using pv311_web_api.DAL.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
@@ -17,15 +18,17 @@ namespace pv311_web_api.BLL.Services.Account
         private readonly RoleManager<AppRole> _roleManager;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly IJwtService _jwtService;
         private readonly IMapper _mapper;
 
-        public AccountService(UserManager<AppUser> userManager, IEmailService emailService, RoleManager<AppRole> roleManager, IMapper mapper, IConfiguration configuration)
+        public AccountService(UserManager<AppUser> userManager, IEmailService emailService, RoleManager<AppRole> roleManager, IMapper mapper, IConfiguration configuration, IJwtService jwtService)
         {
             _userManager = userManager;
             _emailService = emailService;
             _roleManager = roleManager;
             _mapper = mapper;
             _configuration = configuration;
+            _jwtService = jwtService;
         }
 
         public async Task<bool> EmailConfirmAsync(string id, string base64)
@@ -63,45 +66,14 @@ namespace pv311_web_api.BLL.Services.Account
             }
 
             // Jwt generate
-            var claims = new List<Claim>
-            {
-                new Claim("id", user.Id),
-                new Claim("email", user.Email ?? ""),
-                new Claim("userName", user.UserName ?? ""),
-                new Claim("image", user.Image ?? "")
-            };
+            var tokens = await _jwtService.GenerateTokensAsync(user);
 
-            var roles = await _userManager.GetRolesAsync(user);
-
-            if (roles.Any())
+            if(tokens == null)
             {
-                var roleClaims = roles.Select(r => new Claim("role", r));
-                claims.AddRange(roleClaims);
+                return new ServiceResponse("Помилка під час генерування токенів");
             }
 
-            string? audience = _configuration["JwtSettings:Audience"];
-            string? issuer = _configuration["JwtSettings:Issuer"];
-            string? secretKey = _configuration["JwtSettings:SecretKey"];
-            int expMinutes = int.Parse(_configuration["JwtSettings:ExpMinutes"] ?? "");
-
-            if(audience == null || issuer == null || secretKey == null)
-            {
-                throw new ArgumentNullException("Jwt settings not found");
-            }
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-
-            var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
-                claims: claims.ToArray(),
-                expires: DateTime.UtcNow.AddMinutes(expMinutes),
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256)
-                );
-
-            var jwtHandler = new JwtSecurityTokenHandler();
-            string jwtToken = jwtHandler.WriteToken(token);
-            return new ServiceResponse("Успішний вхід", true, jwtToken);
+            return new ServiceResponse("Успішний вхід", true, tokens);
         }
 
         public async Task<ServiceResponse> RegisterAsync(RegisterDto dto)
@@ -133,45 +105,14 @@ namespace pv311_web_api.BLL.Services.Account
             await SendEmailConfirmAsync(user.Id);
 
             // Jwt generate
-            var claims = new List<Claim>
-            {
-                new Claim("id", user.Id),
-                new Claim("email", user.Email ?? ""),
-                new Claim("userName", user.UserName ?? ""),
-                new Claim("image", user.Image ?? "")
-            };
+            var tokens = await _jwtService.GenerateTokensAsync(user);
 
-            var roles = await _userManager.GetRolesAsync(user);
-
-            if (roles.Any())
+            if (tokens == null)
             {
-                var roleClaims = roles.Select(r => new Claim("role", r));
-                claims.AddRange(roleClaims);
+                return new ServiceResponse("Помилка під час генерування токенів");
             }
 
-            string? audience = _configuration["JwtSettings:Audience"];
-            string? issuer = _configuration["JwtSettings:Issuer"];
-            string? secretKey = _configuration["JwtSettings:SecretKey"];
-            int expMinutes = int.Parse(_configuration["JwtSettings:ExpMinutes"] ?? "");
-
-            if (audience == null || issuer == null || secretKey == null)
-            {
-                throw new ArgumentNullException("Jwt settings not found");
-            }
-
-            var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey));
-
-            var token = new JwtSecurityToken(
-                issuer: issuer,
-                audience: audience,
-                claims: claims.ToArray(),
-                expires: DateTime.UtcNow.AddMinutes(expMinutes),
-                signingCredentials: new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256)
-                );
-
-            var jwtHandler = new JwtSecurityTokenHandler();
-            string jwtToken = jwtHandler.WriteToken(token);
-            return new ServiceResponse("Успішна реєстрація", true, jwtToken);
+            return new ServiceResponse("Успішна реєстрація", true, tokens);
         }
 
         public async Task<bool> SendEmailConfirmAsync(string userId)

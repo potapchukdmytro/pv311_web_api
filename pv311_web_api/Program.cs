@@ -11,12 +11,14 @@ using pv311_web_api.BLL.Services.Account;
 using pv311_web_api.BLL.Services.Cars;
 using pv311_web_api.BLL.Services.Email;
 using pv311_web_api.BLL.Services.Image;
+using pv311_web_api.BLL.Services.JwtService;
 using pv311_web_api.BLL.Services.Manufactures;
 using pv311_web_api.BLL.Services.Role;
 using pv311_web_api.BLL.Services.User;
 using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
 using pv311_web_api.DAL.Repositories.Cars;
+using pv311_web_api.DAL.Repositories.JwtRepository;
 using pv311_web_api.DAL.Repositories.Manufactures;
 using pv311_web_api.Middlewares;
 using Serilog;
@@ -63,10 +65,12 @@ builder.Services.AddScoped<IManufactureService, ManufactureService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IImageService, ImageService>();
 builder.Services.AddScoped<ICarService, CarService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
 
 // Add repositories
 builder.Services.AddScoped<ICarRepository, CarRepository>();
 builder.Services.AddScoped<IManufactureRepository, ManufactureRepository>();
+builder.Services.AddScoped<IJwtRepository, JwtRepository>();
 
 builder.Services.AddControllers();
 

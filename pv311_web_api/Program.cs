@@ -60,7 +60,7 @@ var jobs = new (Type type, string cronExpression)[]
 {
     (typeof(ConsoleLogJob), "0 * * * * ?"),
     (typeof(LogCleanJob), "0 1 0 * * ?"),
-    (typeof(EmailJob), "* * * 1 * ?")
+    (typeof(EmailJob), "0 0 12 1 * ?")
 };
 
 builder.Services.AddJobs(jobs);

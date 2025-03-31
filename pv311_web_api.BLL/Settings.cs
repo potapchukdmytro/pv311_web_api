@@ -11,5 +11,7 @@
         // roles
         public const string AdminRole = "admin";
         public const string UserRole = "user";
+        // pagination
+        public const int PageSize = 3;
     }
 }

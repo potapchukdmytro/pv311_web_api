@@ -7,20 +7,15 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using pv311_web_api.BLL;
 using pv311_web_api.BLL.DTOs.Account;
-using pv311_web_api.BLL.Services.Account;
-using pv311_web_api.BLL.Services.Cars;
-using pv311_web_api.BLL.Services.Email;
-using pv311_web_api.BLL.Services.Image;
-using pv311_web_api.BLL.Services.JwtService;
-using pv311_web_api.BLL.Services.Manufactures;
-using pv311_web_api.BLL.Services.Role;
-using pv311_web_api.BLL.Services.User;
 using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
 using pv311_web_api.DAL.Repositories.Cars;
 using pv311_web_api.DAL.Repositories.JwtRepository;
 using pv311_web_api.DAL.Repositories.Manufactures;
+using pv311_web_api.Infrastructure;
+using pv311_web_api.Jobs;
 using pv311_web_api.Middlewares;
+using Quartz;
 using Serilog;
 using System.Text;
 
@@ -58,14 +53,18 @@ builder.Services.AddAuthentication(options =>
     });
 
 // Add services to the container.
-builder.Services.AddScoped<IAccountService, AccountService>();
-builder.Services.AddScoped<IRoleService, RoleService>();
-builder.Services.AddScoped<IEmailService, EmailService>();
-builder.Services.AddScoped<IManufactureService, ManufactureService>();
-builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IImageService, ImageService>();
-builder.Services.AddScoped<ICarService, CarService>();
-builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddServices();
+
+// Add quartz
+var jobs = new (Type type, string cronExpression)[]
+{
+    (typeof(ConsoleLogJob), "0 * * * * ?"),
+    (typeof(LogCleanJob), "0 1 0 * * ?"),
+    (typeof(EmailJob), "* * * 1 * ?")
+};
+
+builder.Services.AddJobs(jobs);
+builder.Services.AddQuartzHostedService(opt => opt.WaitForJobsToComplete = true);
 
 // Add repositories
 builder.Services.AddScoped<ICarRepository, CarRepository>();
@@ -117,7 +116,7 @@ builder.Services.AddEndpointsApiExplorer();
 //builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(options =>
 {
-    options.SwaggerDoc("v1", new OpenApiInfo{ Title = "PV311_API", Version = "v1" });
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "PV311_API", Version = "v1" });
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         Name = "Authorization",

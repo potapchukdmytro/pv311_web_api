@@ -52,8 +52,10 @@ namespace pv311_web_api.BLL.Services.Cars
             return new ServiceResponse($"Автомобіль '{entity.Brand} {entity.Model}' збережено", true);
         }
 
-        public async Task<ServiceResponse> GetAllAsync(int page = 1, int pageSize = 3, string? manufacture = null)
+        public async Task<ServiceResponse> GetAllAsync(int page = 1, int pageSize = Settings.PageSize, string? manufacture = null)
         {
+            pageSize = pageSize < 1 ? Settings.PageSize : pageSize;
+
             var cars = string.IsNullOrEmpty(manufacture)
                 ? _carRepository.GetCars()
                 : _carRepository.GetCars(c => c.Manufacture == null ? false : c.Manufacture.Name.ToLower() == manufacture.ToLower());
@@ -82,7 +84,7 @@ namespace pv311_web_api.BLL.Services.Cars
             return new ServiceResponse("Автомобілі отримано", true, dtoList);
         }
 
-        public async Task<ServiceResponse> GetByPriceAsync(Range range, int page = 1, int pageSize = 3)
+        public async Task<ServiceResponse> GetByPriceAsync(Range range, int page = 1, int pageSize = Settings.PageSize)
         {
             var cars = await _carRepository
                 .GetCars(c => c.Price >= range.Start.Value && c.Price <= range.End.Value)

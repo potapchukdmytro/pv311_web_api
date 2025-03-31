@@ -23,9 +23,9 @@ namespace pv311_web_api.Controllers
         }
 
         [HttpGet("list")]
-        public async Task<IActionResult> GetAllAsync(int page = 1, int pageSize = 10)
+        public async Task<IActionResult> GetAllAsync(int page = 1, int pageSize = 3, string? manufacture = null)
         {
-            var response = await _carService.GetAllAsync(page, pageSize);
+            var response = await _carService.GetAllAsync(page, pageSize, manufacture);
             return CreateActionResult(response);
         }
     }

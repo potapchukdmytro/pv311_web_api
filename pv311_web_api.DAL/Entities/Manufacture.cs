@@ -16,6 +16,6 @@ namespace pv311_web_api.DAL.Entities
         public string? Director { get; set; }
         public string? Image { get; set; }
 
-        public IEnumerable<Car> Cars { get; set; } = [];
+        public virtual ICollection<Car> Cars { get; set; } = [];
     }
 }

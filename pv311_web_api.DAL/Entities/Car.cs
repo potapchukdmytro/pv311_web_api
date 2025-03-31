@@ -25,6 +25,6 @@ namespace pv311_web_api.DAL.Entities
         [ForeignKey("Manufacture")]
         public string? ManufactureId { get; set; }
         public Manufacture? Manufacture { get; set; }
-        public ICollection<CarImage> Images { get; set; } = [];
+        public virtual ICollection<CarImage> Images { get; set; } = [];
     }
 }

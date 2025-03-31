@@ -52,23 +52,40 @@ namespace pv311_web_api.BLL.Services.Cars
             return new ServiceResponse($"Автомобіль '{entity.Brand} {entity.Model}' збережено", true);
         }
 
-        public async Task<ServiceResponse> GetAllAsync(int page = 1, int pageSize = 10)
+        public async Task<ServiceResponse> GetAllAsync(int page = 1, int pageSize = 3, string? manufacture = null)
         {
-            var cars = await _carRepository
-                .GetCars(page, pageSize)
-                .Include(c => c.Images)
-                .Include(c => c.Manufacture)
-                .ToListAsync();
+            var cars = string.IsNullOrEmpty(manufacture)
+                ? _carRepository.GetCars()
+                : _carRepository.GetCars(c => c.Manufacture == null ? false : c.Manufacture.Name.ToLower() == manufacture.ToLower());
 
-            var dtos = _mapper.Map<List<CarDto>>(cars);
+            int count = cars.Count();
+            int pageCount = (int)Math.Ceiling((double)count / pageSize);
 
-            return new ServiceResponse("Автомобілі отримано", true, dtos);
+            page = page < 1 || page > pageCount ? 1 : page;
+
+            cars = cars
+                .Skip(pageSize * (page - 1))
+                .Take(pageSize);
+
+            var list = await cars.ToListAsync();
+
+            var dtos = _mapper.Map<List<CarDto>>(list);
+
+            var dtoList = new CarListDto
+            {
+                Cars = dtos,
+                Page = page,
+                PageCount = pageCount,
+                TotalCount = count
+            };
+
+            return new ServiceResponse("Автомобілі отримано", true, dtoList);
         }
 
-        public async Task<ServiceResponse> GetByPriceAsync(Range range, int page = 1, int pageSize = 10)
+        public async Task<ServiceResponse> GetByPriceAsync(Range range, int page = 1, int pageSize = 3)
         {
             var cars = await _carRepository
-                .GetCars(page, pageSize, c => c.Price >= range.Start.Value && c.Price <= range.End.Value)
+                .GetCars(c => c.Price >= range.Start.Value && c.Price <= range.End.Value)
                 .Include(c => c.Images)
                 .Include(c => c.Manufacture)
                 .ToListAsync();

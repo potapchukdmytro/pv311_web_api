@@ -9,6 +9,7 @@ using pv311_web_api.BLL;
 using pv311_web_api.BLL.DTOs.Account;
 using pv311_web_api.DAL;
 using pv311_web_api.DAL.Entities;
+using pv311_web_api.DAL.Initializer;
 using pv311_web_api.DAL.Repositories.Cars;
 using pv311_web_api.DAL.Repositories.JwtRepository;
 using pv311_web_api.DAL.Repositories.Manufactures;
@@ -149,12 +150,15 @@ app.UseMiddleware<MiddlewareExceptionHandler>();
 app.UseMiddleware<MiddlewareNullExceptionHandler>();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    //app.MapOpenApi();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+//if (app.Environment.IsDevelopment())
+//{
+//    //app.MapOpenApi();
+//    app.UseSwagger();
+//    app.UseSwaggerUI();
+//}
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
@@ -185,5 +189,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+app.Seed();
 
 app.Run();

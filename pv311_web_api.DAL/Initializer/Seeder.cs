@@ -10,15 +10,8 @@ namespace pv311_web_api.DAL.Initializer
         {
             using (var scope = app.ApplicationServices.CreateScope())
             {
-                try
-                {
-                    var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                    await context.Database.MigrateAsync();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
+                var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                await context.Database.MigrateAsync();
             }
         }
     }

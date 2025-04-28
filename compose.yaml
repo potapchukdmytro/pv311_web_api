@@ -15,6 +15,7 @@ services:
       - "api_nt"
 
   api:
+    build: .
     image: potapchuk22/pv311_api
     networks:
       - "api_nt"

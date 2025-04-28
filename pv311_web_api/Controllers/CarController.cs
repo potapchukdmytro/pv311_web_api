@@ -29,5 +29,18 @@ namespace pv311_web_api.Controllers
             var response = await _carService.GetAllAsync(page, pageSize, manufacture);
             return CreateActionResult(response);
         }
+
+        [HttpPut]
+        public IActionResult Update()
+        {
+            return Ok();
+        }
+
+        [HttpDelete]
+        public IActionResult Delete()
+        {
+            return Ok();
+        }
+
     }
 }

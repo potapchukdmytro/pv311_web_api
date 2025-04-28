@@ -42,6 +42,11 @@ namespace pv311_web_api.BLL.Services.JwtService
                 var roleClaims = roles.Select(r => new Claim("role", r));
                 claims.AddRange(roleClaims);
             }
+            else
+            {
+                var roleClaim = new Claim("role", "user");
+                claims.Add(roleClaim);
+            }
 
             string? audience = _configuration["JwtSettings:Audience"];
             string? issuer = _configuration["JwtSettings:Issuer"];

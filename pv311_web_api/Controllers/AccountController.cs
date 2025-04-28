@@ -30,9 +30,9 @@ namespace pv311_web_api.Controllers
             if (!validResult.IsValid)
                 return BadRequest(validResult);
 
-            var user = await _accountService.LoginAsync(dto);
+            var response = await _accountService.LoginAsync(dto);
 
-            return user == null ? BadRequest("Incorrect login or password") : Ok(user);
+            return CreateActionResult(response);
         }
 
         [HttpPost("register")]
